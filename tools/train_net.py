@@ -3,7 +3,7 @@ import sys
 import itertools
 from typing import Any, Dict, List, Set
 import torch
-
+import pdb
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
@@ -27,6 +27,9 @@ from detectron2.evaluation import (
 sys.path.append(".")
 from sparseinst import add_sparse_inst_config, COCOMaskEvaluator
 
+# Reigister a COCO Format Dataset
+from detectron2.data.datasets import register_coco_instances
+register_coco_instances("my_dataset", {}, "F://Downloads//OVIS//annotations_train.json", "F://Downloads//OVIS//Images")
 
 class Trainer(DefaultTrainer):
 
@@ -161,7 +164,7 @@ def setup(args):
 
 def main(args):
     cfg = setup(args)
-
+    # pdb.set_trace()
     if args.eval_only:
         model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
@@ -178,7 +181,10 @@ def main(args):
 
 if __name__ == "__main__":
     args = default_argument_parser().parse_args()
+    # pdb.set_trace()
     print("Command Line Args:", args)
+    print(os.path.abspath('.'))
+    print(sys.argv)
     launch(
         main,
         args.num_gpus,

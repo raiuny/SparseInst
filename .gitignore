@@ -46,6 +46,6 @@ _darcs
 !/datasets/*.*
 /projects/*/datasets
 /models
-
+pretrained_models/*
 # mac file
 .DS_Store

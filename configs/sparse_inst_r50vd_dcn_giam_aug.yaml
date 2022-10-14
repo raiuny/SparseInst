@@ -19,8 +19,16 @@ INPUT:
 OUTPUT_DIR: "output/sparse_inst_r50vd_dcn_giam_aug"
 
 DATASETS:
+  PRECOMPUTED_PROPOSAL_TOPK_TEST: 100
+  PRECOMPUTED_PROPOSAL_TOPK_TRAIN: 200
   TEST:
-  - coco_2017_val
+  - ovis_test
   TRAIN:
-  - my_dataset
+  - ovis_train
   
+DATALOADER:
+  NUM_WORKERS: 2
+
+SOLVER:
+  IMS_PER_BATCH: 2
+

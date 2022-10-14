@@ -25,11 +25,15 @@ from detectron2.evaluation import (
 )
 
 sys.path.append(".")
-from sparseinst import add_sparse_inst_config, COCOMaskEvaluator
+from sparseinst import add_sparse_inst_config, COCOMaskEvaluator, YTVISDatasetMapper
+from datasets import *
+
 
 # Reigister a COCO Format Dataset
 from detectron2.data.datasets import register_coco_instances
-register_coco_instances("my_dataset", {}, "F://Downloads//OVIS//annotations_train.json", "F://Downloads//OVIS//Images")
+# register_coco_instances("my_dataset", {}, "F://Downloads//OVIS//annotations_train.json", "F://Downloads//OVIS//Images//train")
+
+
 
 class Trainer(DefaultTrainer):
 
@@ -139,12 +143,27 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
+        dataset_name = cfg.DATASETS.TRAIN[0]
+        print(dataset_name)
         if cfg.MODEL.SPARSE_INST.DATASET_MAPPER == "SparseInstDatasetMapper":
             from sparseinst import SparseInstDatasetMapper
             mapper = SparseInstDatasetMapper(cfg, is_train=True)
         else:
             mapper = None
-        return build_detection_train_loader(cfg, mapper=mapper)
+        # mapper = YTVISDatasetMapper(cfg, is_train=True)
+        dataset_dict = get_detection_dataset_dicts(
+            dataset_name,
+            filter_empty=cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS,
+            proposal_files=cfg.DATASETS.PROPOSAL_FILES_TRAIN if cfg.MODEL.LOAD_PROPOSALS else None,
+        )
+
+        return build_detection_train_loader(cfg, mapper=mapper, dataset=dataset_dict)
+        # if cfg.MODEL.SPARSE_INST.DATASET_MAPPER == "SparseInstDatasetMapper":
+        #     from sparseinst import SparseInstDatasetMapper
+        #     mapper = SparseInstDatasetMapper(cfg, is_train=True)
+        # else:
+        #     mapper = None
+        # return build_detection_train_loader(cfg, mapper=mapper)
 
 
 def setup(args):
@@ -183,7 +202,6 @@ if __name__ == "__main__":
     args = default_argument_parser().parse_args()
     # pdb.set_trace()
     print("Command Line Args:", args)
-    print(os.path.abspath('.'))
     print(sys.argv)
     launch(
         main,
